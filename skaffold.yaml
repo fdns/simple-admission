@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta13
+kind: Config
+metadata:
+  name: simple-admission
+build:
+  artifacts:
+  - image: fdns/simple-admission
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - manifests/simple-admission.yaml
