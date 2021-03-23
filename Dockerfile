@@ -1,4 +1,4 @@
-FROM golang:1.13.8 as builder
+FROM golang:1.16.2 as builder
 
 WORKDIR $GOPATH/src/github.com/fdns/simple-admission
 COPY go.mod .

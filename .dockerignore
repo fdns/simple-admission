@@ -1,4 +1,7 @@
-.git
+.git/
+manifests/
+tmp/
+fixtures/
+
 Dockerfile
 Makefile
-manifests
