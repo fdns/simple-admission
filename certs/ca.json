@@ -1,8 +1,0 @@
-{
-  "CN": "simple-admission",
-  "key": {
-    "algo": "rsa",
-    "size": 2048
-  },
-  "expity": "350400h"
-}
