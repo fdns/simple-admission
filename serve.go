@@ -16,6 +16,7 @@ type AdmissionHandler struct {
 	RuntimeClass string
 }
 
+// Handle requests
 func (handler *AdmissionHandler) handler(w http.ResponseWriter, r *http.Request) {
 	var body []byte
 	if r.Body != nil {
@@ -92,19 +93,29 @@ func checkRequest(request *admission.AdmissionRequest, handler *AdmissionHandler
 	return checkJob(job, handler)
 }
 
-/// Check that the given job has the runtimeclass and exclude denied parameters
-/// We must check:
-/// - HostNetwork is false
-/// - HostIPC is false
-/// - HostPID is false
-/// - RuntimeClass is the correct value
-/// - SecurityContext.RunAsNonRoot must be set
-/// - SecurityContext.AllowPrivilegeEscalation
-/// - Privileged is false
-/// - All capabilities are dropped
-/// - The container has no volumes (Except secrets)
-/// - Container ports is empty
+// Check that the applied job has all the security properties set
 func checkJob(request *batchv1.Job, handler *AdmissionHandler) (bool, error) {
+	if request.Spec.ActiveDeadlineSeconds == nil || *request.Spec.ActiveDeadlineSeconds == 0 {
+		return false, fmt.Errorf("activeDeadlineSeconds must be set")
+	}
+
+	if request.Spec.BackoffLimit == nil || *request.Spec.BackoffLimit != 1 {
+		return false, fmt.Errorf("backoffLimit mus be set to 1")
+	}
+
+	if request.Spec.Parallelism != nil && *request.Spec.Parallelism != 1 {
+		return false, fmt.Errorf("Parallelism must not be used")
+	}
+
+	if request.Spec.Completions != nil && *request.Spec.Completions != 1 {
+		return false, fmt.Errorf("Completions must not be used")
+	}
+
+	// TTLSecondsAfterFinished is an alpha feature, and must be enabled manually
+	//if request.Spec.TTLSecondsAfterFinished == nil || *request.Spec.TTLSecondsAfterFinished == 0 {
+	//	return false, fmt.Errorf("ttlSecondsAfterFinished must be set greater than 0")
+	//}
+
 	spec := request.Spec.Template.Spec
 	if spec.RuntimeClassName == nil || *spec.RuntimeClassName != handler.RuntimeClass {
 		return false, fmt.Errorf("wrong RuntimeClass %v is set for job %v, must be %v", spec.RuntimeClassName, request.Name, handler.RuntimeClass)
@@ -180,6 +191,22 @@ func checkJob(request *batchv1.Job, handler *AdmissionHandler) (bool, error) {
 
 		if len(container.VolumeMounts) > 0 {
 			return false, fmt.Errorf("VolumeMounts are not supported")
+		}
+
+		if container.Resources.Requests.Cpu() == nil || container.Resources.Limits.Cpu() == nil || container.Resources.Requests.Cpu().IsZero() || container.Resources.Limits.Cpu().IsZero() {
+			return false, fmt.Errorf("Container cpu requests and limit must be set")
+		}
+
+		if !container.Resources.Requests.Cpu().Equal(*container.Resources.Limits.Cpu()) {
+			return false, fmt.Errorf("CPU request must be set and equal to limits")
+		}
+
+		if container.Resources.Requests.Memory() == nil || container.Resources.Limits.Memory() == nil || container.Resources.Requests.Memory().IsZero() || container.Resources.Limits.Memory().IsZero() {
+			return false, fmt.Errorf("Container memory requests and limit must be set")
+		}
+
+		if !container.Resources.Requests.Memory().Equal(*container.Resources.Limits.Memory()) {
+			return false, fmt.Errorf("Memory request must be set and equal to limits")
 		}
 	}
 

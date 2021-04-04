@@ -11,3 +11,4 @@ deploy:
   kubectl:
     manifests:
     - manifests/simple-admission.yaml
+    - certs/manifest.yaml

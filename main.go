@@ -12,18 +12,15 @@ import (
 	"syscall"
 )
 
-const (
-	port = "8443"
-)
-
 var (
-	certFile, keyFile, runtimeClass string
+	certFile, keyFile, runtimeClass, port string
 )
 
 func main() {
 	flag.StringVar(&certFile, "certFileFile", "/certs/server.pem", "File containing the x509 Certificate for HTTPS.")
 	flag.StringVar(&keyFile, "keyFileFile", "/certs/server-key.pem", "File containing the x509 private key to --certFileFile.")
 	flag.StringVar(&runtimeClass, "runtimeClass", "gvisor", "RuntimeClass of the sandboxed environment")
+	flag.StringVar(&port, "port", "8443", "Port to listen")
 
 	flag.Parse()
 

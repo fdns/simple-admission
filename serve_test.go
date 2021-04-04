@@ -11,10 +11,11 @@ import (
 	admission "k8s.io/api/admission/v1beta1"
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func loadValidJob(t *testing.T) admission.AdmissionReview {
-	body := `{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"uid":"bb1d3b77-a678-4aec-9dff-846120cf1675","kind":{"group":"batch","version":"v1","kind":"Job"},"resource":{"group":"batch","version":"v1","resource":"jobs"},"requestKind":{"group":"batch","version":"v1","kind":"Job"},"requestResource":{"group":"batch","version":"v1","resource":"jobs"},"name":"test","namespace":"default","operation":"CREATE","userInfo":{"username":"kubernetes-admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"Job","apiVersion":"batch/v1","metadata":{"name":"test","namespace":"default","uid":"0ad3e67c-42aa-4e5f-bf31-e58dd8258b74","creationTimestamp":"2021-03-23T01:14:52Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"batch/v1\",\"kind\":\"Job\",\"metadata\":{\"annotations\":{},\"creationTimestamp\":null,\"name\":\"test\",\"namespace\":\"default\"},\"spec\":{\"template\":{\"metadata\":{\"creationTimestamp\":null},\"spec\":{\"containers\":[{\"command\":[\"echo\",\"1\"],\"image\":\"nginx\",\"name\":\"test\",\"resources\":{},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"all\"]},\"privileged\":false,\"runAsNonRoot\":true}}],\"restartPolicy\":\"Never\",\"runtimeClassName\":\"gvisor\"}}},\"status\":{}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"batch/v1","time":"2021-03-23T01:14:52Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{"f:backoffLimit":{},"f:completions":{},"f:parallelism":{},"f:template":{"f:spec":{"f:containers":{"k:{\"name\":\"test\"}":{".":{},"f:command":{},"f:image":{},"f:imagePullPolicy":{},"f:name":{},"f:resources":{},"f:securityContext":{".":{},"f:allowPrivilegeEscalation":{},"f:capabilities":{".":{},"f:drop":{}},"f:privileged":{},"f:runAsNonRoot":{}},"f:terminationMessagePath":{},"f:terminationMessagePolicy":{}}},"f:dnsPolicy":{},"f:restartPolicy":{},"f:runtimeClassName":{},"f:schedulerName":{},"f:securityContext":{},"f:terminationGracePeriodSeconds":{}}}}}}]},"spec":{"parallelism":1,"completions":1,"backoffLimit":6,"selector":{"matchLabels":{"controller-uid":"0ad3e67c-42aa-4e5f-bf31-e58dd8258b74"}},"template":{"metadata":{"creationTimestamp":null,"labels":{"controller-uid":"0ad3e67c-42aa-4e5f-bf31-e58dd8258b74","job-name":"test"}},"spec":{"containers":[{"name":"test","image":"nginx","command":["echo","1"],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always","securityContext":{"capabilities":{"drop":["all"]},"privileged":false,"runAsNonRoot":true,"allowPrivilegeEscalation":false}}],"restartPolicy":"Never","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler","runtimeClassName":"gvisor"}}},"status":{}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1","fieldManager":"kubectl-client-side-apply"}}}`
+	body := `{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"uid":"e1b0cabd-700d-4ed2-90ab-7e0957da7037","kind":{"group":"batch","version":"v1","kind":"Job"},"resource":{"group":"batch","version":"v1","resource":"jobs"},"requestKind":{"group":"batch","version":"v1","kind":"Job"},"requestResource":{"group":"batch","version":"v1","resource":"jobs"},"name":"busybox","namespace":"default","operation":"CREATE","userInfo":{"username":"kubernetes-admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"Job","apiVersion":"batch/v1","metadata":{"name":"busybox","namespace":"default","uid":"c0381bc6-f7dd-49b3-a21d-4aa95f0f2d7b","creationTimestamp":"2021-04-04T22:30:26Z","annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"batch/v1\",\"kind\":\"Job\",\"metadata\":{\"annotations\":{},\"name\":\"busybox\",\"namespace\":\"default\"},\"spec\":{\"activeDeadlineSeconds\":30,\"backoffLimit\":1,\"template\":{\"spec\":{\"containers\":[{\"command\":[\"sleep\",\"120\"],\"env\":[{\"name\":\"TEST\",\"value\":\"VALUE\"}],\"image\":\"busybox\",\"name\":\"busybox\",\"resources\":{\"limits\":{\"cpu\":\"10m\",\"memory\":\"50Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"50Mi\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"all\"]},\"privileged\":false,\"runAsNonRoot\":true,\"runAsUser\":33}}],\"restartPolicy\":\"Never\",\"runtimeClassName\":\"gvisor\"}},\"ttlSecondsAfterFinished\":86400}}\n"},"managedFields":[{"manager":"kubectl-client-side-apply","operation":"Update","apiVersion":"batch/v1","time":"2021-04-04T22:30:26Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{"f:activeDeadlineSeconds":{},"f:backoffLimit":{},"f:completions":{},"f:parallelism":{},"f:template":{"f:spec":{"f:containers":{"k:{\"name\":\"busybox\"}":{".":{},"f:command":{},"f:env":{".":{},"k:{\"name\":\"TEST\"}":{".":{},"f:name":{},"f:value":{}}},"f:image":{},"f:imagePullPolicy":{},"f:name":{},"f:resources":{".":{},"f:limits":{".":{},"f:cpu":{},"f:memory":{}},"f:requests":{".":{},"f:cpu":{},"f:memory":{}}},"f:securityContext":{".":{},"f:allowPrivilegeEscalation":{},"f:capabilities":{".":{},"f:drop":{}},"f:privileged":{},"f:runAsNonRoot":{},"f:runAsUser":{}},"f:terminationMessagePath":{},"f:terminationMessagePolicy":{}}},"f:dnsPolicy":{},"f:restartPolicy":{},"f:runtimeClassName":{},"f:schedulerName":{},"f:securityContext":{},"f:terminationGracePeriodSeconds":{}}},"f:ttlSecondsAfterFinished":{}}}}]},"spec":{"parallelism":1,"completions":1,"activeDeadlineSeconds":30,"backoffLimit":1,"selector":{"matchLabels":{"controller-uid":"c0381bc6-f7dd-49b3-a21d-4aa95f0f2d7b"}},"template":{"metadata":{"creationTimestamp":null,"labels":{"controller-uid":"c0381bc6-f7dd-49b3-a21d-4aa95f0f2d7b","job-name":"busybox"}},"spec":{"containers":[{"name":"busybox","image":"busybox","command":["sleep","120"],"env":[{"name":"TEST","value":"VALUE"}],"resources":{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always","securityContext":{"capabilities":{"drop":["all"]},"privileged":false,"runAsUser":33,"runAsNonRoot":true,"allowPrivilegeEscalation":false}}],"restartPolicy":"Never","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler","runtimeClassName":"gvisor"}}},"status":{}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1","fieldManager":"kubectl-client-side-apply"}}}`
 	adm := admission.AdmissionReview{}
 	if err := json.Unmarshal([]byte(body), &adm); err != nil {
 		t.Fatalf("Error loading job %v", err)
@@ -110,8 +111,14 @@ func TestInvalidMinimalJob(t *testing.T) {
 
 func TestInvalidCases(t *testing.T) {
 	errorMap := map[string]interface{}{
-		"nosecuritypolicy": func(job *batchv1.Job) { job.Spec.Template.Spec.Containers[0].SecurityContext = nil },
-		"nocaps":           func(job *batchv1.Job) { job.Spec.Template.Spec.Containers[0].SecurityContext.Capabilities = nil },
+		"noactiveDeadlineSeconds":   func(job *batchv1.Job) { job.Spec.ActiveDeadlineSeconds = nil },
+		"zeroactiveDeadlineSeconds": func(job *batchv1.Job) { *job.Spec.ActiveDeadlineSeconds = 0 },
+		"nobackoff":                 func(job *batchv1.Job) { job.Spec.BackoffLimit = nil },
+		"notonebackoff":             func(job *batchv1.Job) { *job.Spec.BackoffLimit = 2 },
+		"parallelism":               func(job *batchv1.Job) { *job.Spec.Parallelism = 2 },
+		"completions":               func(job *batchv1.Job) { *job.Spec.Completions = 2 },
+		"nosecuritypolicy":          func(job *batchv1.Job) { job.Spec.Template.Spec.Containers[0].SecurityContext = nil },
+		"nocaps":                    func(job *batchv1.Job) { job.Spec.Template.Spec.Containers[0].SecurityContext.Capabilities = nil },
 		"addcaps": func(job *batchv1.Job) {
 			job.Spec.Template.Spec.Containers[0].SecurityContext.Capabilities.Add = []v1.Capability{"NET_ADMIN"}
 		},
@@ -175,6 +182,18 @@ func TestInvalidCases(t *testing.T) {
 		},
 		"volume": func(job *batchv1.Job) {
 			job.Spec.Template.Spec.Volumes = []v1.Volume{v1.Volume{}}
+		},
+		"nocpu": func(job *batchv1.Job) {
+			job.Spec.Template.Spec.Containers[0].Resources.Requests[v1.ResourceCPU] = resource.MustParse("0")
+		},
+		"nocpuequal": func(job *batchv1.Job) {
+			job.Spec.Template.Spec.Containers[0].Resources.Requests[v1.ResourceCPU] = resource.MustParse("30m")
+		},
+		"nomem": func(job *batchv1.Job) {
+			job.Spec.Template.Spec.Containers[0].Resources.Requests[v1.ResourceMemory] = resource.MustParse("0")
+		},
+		"nomemequal": func(job *batchv1.Job) {
+			job.Spec.Template.Spec.Containers[0].Resources.Requests[v1.ResourceMemory] = resource.MustParse("30Mi")
 		},
 	}
 

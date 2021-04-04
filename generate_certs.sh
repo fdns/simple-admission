@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 service=$1
 namespace=$2
 
@@ -54,12 +56,13 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
  name: simple-admission.default.cluster.local
+ namespace: $namespace
 webhooks:
 - name: simple-admission.default.cluster.local
   clientConfig:
     service:
       name: simple-admission
-      namespace: default
+      namespace: $namespace
       path: "/validate"
     caBundle: $(cat $destdir/ca.pem | base64 | tr -d '\n')
   rules:
@@ -68,11 +71,11 @@ webhooks:
     resources: ["jobs"]
     operations: ["CREATE"]
     scope: "*"
-  #namespaceSelector:
-  #  matchExpressions:
-  #  - key: name
-  #    operator: In
-  #    values: ["default"]
+  namespaceSelector:
+    matchExpressions:
+    - key: name
+      operator: In
+      values: ["$namespace"]
   admissionReviewVersions: ["v1"]
   sideEffects: None
   failurePolicy: Fail
@@ -82,6 +85,7 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: admission-certs
+  namespace: $namespace
 data:
   server-key.pem: $(cat $outKeyFile | base64 | tr -d '\n')
   server.pem: $(cat $outCertFile | base64 | tr -d '\n')
