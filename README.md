@@ -6,6 +6,7 @@ This admission controller will filter all jobs created in the default namespace,
 ## Usage
 All documentation to run it can be found at the makefile
 ```
+> make help
 Use make NAMESPACE=override to change the target namespace
 
 build                          Build docker image with tag fdns/simple-admission:latest
