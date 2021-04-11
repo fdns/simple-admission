@@ -8,9 +8,6 @@ RUN go mod download
 
 COPY . .
 
-
-#RUN go get -d -v
-
 RUN CGO_ENABLED=0 go build -o /go/bin/simple-admission
 
 FROM scratch

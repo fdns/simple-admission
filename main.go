@@ -53,7 +53,7 @@ func main() {
 		}
 	}()
 
-	// listening shutdown singal
+	// Listen to the shutdown signal
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
